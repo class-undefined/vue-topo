@@ -1,21 +1,37 @@
 <template>
   <el-menu>
-    <el-submenu v-for="(item,index) in menuItems" :key="index" :index="index">
+    <el-submenu v-for="(item,index) in menuItems" :key="index" :index="index.toString()">
       <template slot="title">
         {{ item.itemName }}
       </template>
       <el-menu-item-group>
-        <el-menu-item>
+        <!--tooltip-->
+        <el-tooltip
+            v-for="(iconItem) in item.icons"
+            :key="iconItem.path"
+            effect="dark"
+            :content="iconItem.desc"
+            placement="right">
+          <!--          菜单项-->
+          <el-menu-item>
+            <!--            svg图标-->
+            <div draggable="true"
+                 @dragstart="dragstartHandle($event,iconItem)">
+              <svg-icon :icon-class="iconItem.path"/>
+            </div>
 
-        </el-menu-item>
+          </el-menu-item>
+        </el-tooltip>
+
       </el-menu-item-group>
-
     </el-submenu>
 
   </el-menu>
 </template>
 
 <script>
+import config from "@/icons/config";
+
 export default {
   name: "Menu",
   components: {},
@@ -41,10 +57,27 @@ export default {
       }
 
     }
+  },
+  data() {
+    return {
+      svg: config.svg,
+      index: 0
+    }
+  },
+  methods: {
+    dragstartHandle(e, iconItem) {
+      // console.log(e.target.children[0]);
+      /*将拖动目标的信息转换成json文本存放到事件中*/
+      let data = JSON.stringify({path: iconItem.path, title: iconItem.title, desc: iconItem.desc})
+      e.dataTransfer.setData("text/plain",data)
+    }
   }
 }
 </script>
 
 <style scoped>
+.icon-cell {
+  /*display: inline-block;*/
 
+}
 </style>

@@ -1,10 +1,11 @@
 <template>
-  <svg :class="svgClass" aria-hidden="true">
+  <svg :height="size.h" :width="size.w" :class="svgClass" v-on="$listeners">
     <use :xlink:href="iconName"/>
   </svg>
 </template>
 
 <script>
+import config from "@/icons/config";
 export default {
   name: "svgIcon",
   props: {
@@ -16,6 +17,15 @@ export default {
       type: String,
       default: '',
     },
+    size:{//图标大小 默认为32*32
+      type:Object,
+      default(){
+        return{
+          w:config.svg.width,
+          h:config.svg.height
+        }
+      }
+    }
   },
   computed: {
     iconName() {
@@ -34,9 +44,9 @@ export default {
 
 <style scoped>
 .svg-icon {
+  margin: 3px;
   width: 2em;
   height: 2em;
-  fill: currentColor;
-  overflow: hidden;
+  /*position: absolute;*/
 }
 </style>

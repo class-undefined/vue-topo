@@ -1,18 +1,18 @@
 <template>
   <div id="app">
-<!--    <Topo/>-->
-    <svg-icon icon-class="qq"></svg-icon>
+    <Topo/>
+<!--    <svg-icon icon-class="qq"></svg-icon>-->
   </div>
 </template>
 
 <script>
 
-// import Topo from "@/components/Topo";
+import Topo from "@/components/Topo";
 
 export default {
   name: 'app',
   components: {
-    // Topo
+    Topo
   }
 }
 </script>

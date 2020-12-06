@@ -1,16 +1,18 @@
 <template>
   <div id="app">
-
+<!--    <Topo/>-->
+    <svg-icon icon-class="qq"></svg-icon>
   </div>
 </template>
 
 <script>
 
+// import Topo from "@/components/Topo";
 
 export default {
   name: 'app',
   components: {
-
+    // Topo
   }
 }
 </script>

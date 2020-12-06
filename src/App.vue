@@ -8,7 +8,6 @@
 <script>
 
 import Topo from "@/components/Topo";
-
 export default {
   name: 'app',
   components: {
@@ -18,6 +17,9 @@ export default {
 </script>
 
 <style>
+*{
+  font-weight: 300;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

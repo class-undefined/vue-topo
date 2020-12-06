@@ -25,6 +25,10 @@ export default {
           h:config.svg.height
         }
       }
+    },
+    context:{
+      type:String,
+      required: false
     }
   },
   computed: {

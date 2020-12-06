@@ -1,7 +1,7 @@
 let config = {
     "svg":{
-        height:32,
-        width:32
+        height:48,
+        width:48
     }
 }
 export default config

@@ -30,14 +30,14 @@ export default {
         {
           itemName: "分类一",
           icons: [
-            {title: '图标一', desc: '描述文本', path: '1'},
-            {title: '图标二', desc: '描述文本', path: '2'}]
+            {title: '图标一', desc: '描述文本1', path: '1'},
+            {title: '图标二', desc: '描述文本2', path: '2'}]
         },
         {
           itemName: "分类二",
           icons: [
-            {title: '图标三', desc: '描述文本', path: '3'},
-            {title: '图标四', desc: '描述文本', path: '4'}]
+            {title: '图标三', desc: '描述文本3', path: '3'},
+            {title: '图标四', desc: '描述文本4', path: '4'}]
         },]
     }
   }

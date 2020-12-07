@@ -5,8 +5,8 @@
       oncontextmenu="return false"
       :style="{left:x + 'px',top:y + 'px'}">
     <ul>
-      <li @click="click('link')">
-        <span>移除</span>
+      <li @click="click(item)" v-for="item in menuList" :key="item.code">
+        <span>{{item.title}}</span>
       </li>
     </ul>
   </div>
@@ -15,7 +15,7 @@
 
 <script>
 import config from "@/icons/config";
-
+import menuConfig from "@/components/ContextMenu/config"
 export default {
   name: "ContextMenu",
   data() {
@@ -45,10 +45,15 @@ export default {
     })
   },
   methods: {
-    /*菜单栏单击事件：发送deleteCell消息，携带参数为组件id*/
-    click() {
+    /*菜单栏单击事件：发送deleteCell消息，携带参数为组件id 在DrawBoard组件中的create事件中接受该事件*/
+    click(menuItem) {
       // eslint-disable-next-line no-undef
-      globalEvent.$emit('deleteCell',this.item.id)
+      globalEvent.$emit('contextMenuClick', {menuItem,'svgCellItemId':this.item.id})
+    }
+  },
+  computed:{
+    menuList(){
+      return menuConfig.menuItem
     }
   }
 }

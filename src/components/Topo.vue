@@ -11,6 +11,9 @@
         </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
+      <el-aside width="200px">
+        <attribute-editor/>
+      </el-aside>
     </el-container>
   </el-container>
 </template>
@@ -18,14 +21,19 @@
 <script>
 import Menu from "@/components/Menu/Menu";
 import DrawBoard from "@/components/DrawBoard/DrawBoard";
+import AttributeEditor from "@/components/AttributeEditor/AttributeEditor";
+
 export default {
   name: "Topo",
   components: {
     DrawBoard,
-    Menu
+    Menu,
+    AttributeEditor
   },
   data() {
     return {
+      elAsideRight: undefined,
+      className: 'el-aside',
       menuItems: [
         {
           itemName: "分类一",
@@ -41,7 +49,6 @@ export default {
         },]
     }
   }
-
 }
 </script>
 
@@ -54,7 +61,9 @@ export default {
 }
 
 .el-aside {
-  background-color: #D3DCE6;
+  /*background-color: #D3DCE6;*/
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
   color: #333;
   text-align: center;
   line-height: 200px;
@@ -79,5 +88,13 @@ body > .el-container {
 
 .el-container:nth-child(7) .el-aside {
   line-height: 320px;
+}
+
+.el-aside-right-hover {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  color: #333;
+  text-align: center;
+  line-height: 200px;
 }
 </style>

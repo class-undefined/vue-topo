@@ -15,7 +15,9 @@
          :rel="key"
          :transform="'translate(' + item.data.mouseData.x +',' + item.data.mouseData.y +')'">
         <!--        通过建立一个单独的use层去掉svg-->
-        <svg-use :iconClass="item.data.svgData.path"></svg-use>
+        <svg-use
+            @click="svgCellClicked($event,item)"
+            :iconClass="item.data.svgData.path"></svg-use>
         <!--        {{// item}}-->
         <text :x="svgWidth - 5" :y="svgHeight*1.3" style="text-anchor: end; user-select: none;font-size: 13px">
           {{ item.data.svgData.title }}
@@ -144,8 +146,15 @@ export default {
       // eslint-disable-next-line no-undef
       globalEvent.$emit('drwaBoardClicked', true)
     },
+    /*svg元素被单击 发送svgCellClicked事件 接收方为AttributeEditor组件*/
+    svgCellClicked(e,cellItem){
+      // eslint-disable-next-line no-undef
+      globalEvent.$emit('svgCellClicked',{e,'item':cellItem})
+    }
   },
-  /*绑定事件  Event:deleteCell*/
+  /*绑定事件  Event:deleteCell
+  * 发送信号  reName 至 AttributeEditor created中
+  * 发送信号  deleteSvg 至 AttributeEditor created*/
   created() {
     let self = this
     // eslint-disable-next-line no-undef
@@ -153,10 +162,14 @@ export default {
       console.log(data.menuItem);
       switch (data.menuItem.code) {
         case 0:
+          // eslint-disable-next-line no-undef
+          globalEvent.$emit('reName')
           break
         case 1:
           /*通过组件item的id删除svgNodes元素*/
           self.$delete(self.svgNodes, data.svgCellItemId)
+          // eslint-disable-next-line no-undef
+          globalEvent.$emit('deleteSvg')
           break
       }
 

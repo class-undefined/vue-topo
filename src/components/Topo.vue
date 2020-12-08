@@ -62,7 +62,7 @@ export default {
 
 .el-aside {
   /*background-color: #D3DCE6;*/
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 20px 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   color: #333;
   text-align: center;

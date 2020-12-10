@@ -6,7 +6,7 @@
          @mousemove="mousemove"
          @drop="dropHandle">
       <!--    g标签包裹svg实现定位操作-->
-      <g v-for="(item,key) in svgNodes"
+      <g v-for="(item,key) in svgNodes" @click="svgCellClicked($event,item)"
 
          @mouseenter="mouseenter"
          @mousedown="mousedown($event,item)"
@@ -16,12 +16,13 @@
          :transform="'translate(' + item.data.mouseData.x +',' + item.data.mouseData.y +')'">
         <!--        通过建立一个单独的use层去掉svg-->
         <svg-use
-            @click="svgCellClicked($event,item)"
+
             :iconClass="item.data.svgData.path"></svg-use>
         <!--        {{// item}}-->
         <text :x="svgWidth - 5" :y="svgHeight*1.3" style="text-anchor: end; user-select: none;font-size: 13px">
           {{ item.data.svgData.title }}
         </text>
+
       </g>
 
     </svg>
@@ -57,7 +58,8 @@ export default {
         title: '',
         desc: ''
       },//svg信息
-      svgNodes: {}//svg节点 List
+      svgNodes: {},//svg节点 Map
+      svgLinks:[]//连线节点
     }
   },
   watch: {
@@ -144,12 +146,18 @@ export default {
     /*画板被单击*/
     divClick() {
       // eslint-disable-next-line no-undef
-      globalEvent.$emit('drwaBoardClicked', true)
+      globalEvent.$emit('drawBoardClicked', true)
     },
     /*svg元素被单击 发送svgCellClicked事件 接收方为AttributeEditor组件*/
     svgCellClicked(e,cellItem){
       // eslint-disable-next-line no-undef
       globalEvent.$emit('svgCellClicked',{e,'item':cellItem})
+    },
+    /*TODO: svg组件之间使用Line元素连接*/
+    svgLink(e,item){
+      console.log(e);
+      console.log(item);
+
     }
   },
   /*绑定事件  Event:deleteCell

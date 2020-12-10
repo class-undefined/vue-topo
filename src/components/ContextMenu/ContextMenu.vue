@@ -40,7 +40,7 @@ export default {
     })
     /*接受画板被单击的事件消息*/
     // eslint-disable-next-line no-undef
-    globalEvent.$on('drwaBoardClicked',()=>{
+    globalEvent.$on('drawBoardClicked',()=>{
       this.isShow = false
     })
   },

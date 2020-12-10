@@ -33,8 +33,8 @@ export default {
     // eslint-disable-next-line no-undef
     globalEvent.$on('cellCheck', res => {
       // this.cellCheckEventData = res
-      this.x = res.e.offsetX + config.svg.width
-      this.y = res.e.offsetY
+      this.x = res.e.pageX + config.svg.width
+      this.y = res.e.pageY
       this.item = res.item
       this.isShow = true
     })

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Topo/>
+    <context-menu></context-menu>
 <!--    <svg-icon icon-class="qq"></svg-icon>-->
   </div>
 </template>
@@ -8,10 +9,11 @@
 <script>
 
 import Topo from "@/components/Topo";
+import ContextMenu from "@/components/ContextMenu/ContextMenu";
 export default {
   name: 'app',
   components: {
-    Topo
+    Topo,ContextMenu
   }
 }
 </script>

@@ -26,19 +26,18 @@
       </g>
 
     </svg>
-    <context-menu></context-menu>
   </div>
 
 </template>
 
 <script>
 import config from "@/icons/config";
-import ContextMenu from "@/components/ContextMenu/ContextMenu";
+// import ContextMenu from "@/components/ContextMenu/ContextMenu";
 
 export default {
   name: "DrawBoard",
   components: {
-    ContextMenu
+    // ContextMenu
   },
   data() {
     return {
@@ -48,6 +47,7 @@ export default {
         x: 0,
         y: 0
       },
+      eventState: 0,//事件状态  当svg-use 的g层被单击 eventState将由link => pointer 但首先会获取到link
       count: 0,//key
       mouseData: {
         x: null,
@@ -59,16 +59,19 @@ export default {
         desc: ''
       },//svg信息
       svgNodes: {},//svg节点 Map
-      svgLinks:[]//连线节点
+      svgLinks: []//连线节点
     }
   },
   watch: {
     svgNodes() {
       // console.log(this.svgNodes);
+    },
+    eventState(newVal, ordVal) {
+      console.log(ordVal + ' => ' + newVal);
     }
   },
   methods: {
-    /*接收拖放元素的事件*/
+    /*接收拖放元素的事件 svgNodes在此处更新键值对*/
     dropHandle(e) {
       /*  DrawBoard.vue?c315:14 {"path":"3","title":"图标三","desc":"描述文本"}*/
       this.svgData = JSON.parse(e.dataTransfer.getData('text/plain'))//拖放成功则将该信息赋值给svgData
@@ -95,6 +98,18 @@ export default {
           y: this.mouseData.y
         }
       }
+      let nodeItem = {
+        /*自身数据集只需具备一个*/
+        selfData: {
+          id: key,
+          x: 0,
+          y: 0
+        },
+        /*对于连接的其他元素，应该使用一个Array存储*/
+        nextNodes: [
+          // {id:0,x:0,y:0}
+        ]
+      }
       /*item:{
         id:Number,
         data:{
@@ -104,7 +119,8 @@ export default {
       }*/
       let item = {
         id: key,//组件唯一标识符 int
-        data: value//组件的svg信息及鼠标信息  {svgData,mouseData}
+        data: value,//组件的svg信息及鼠标信息  {svgData,mouseData}
+        nodes: nodeItem//组件的节点信息
       }
       /*将svg节点加入svgNodes中*/
       this.$set(this.svgNodes, key, item)
@@ -123,8 +139,13 @@ export default {
       let self = e.target
       self.style.cursor = 'move'//设置手型指针
       document.onmousemove = event => {
-        this.$set(item.data.mouseData, 'x', event.offsetX - config.svg.width / 2)
-        this.$set(item.data.mouseData, 'y', event.offsetY - config.svg.width / 2)
+        let x = event.offsetX - config.svg.width / 2
+        let y = event.offsetY - config.svg.width / 2
+        this.$set(item.data.mouseData, 'x', x)
+        this.$set(item.data.mouseData, 'y', y)
+        this.$set(item.nodes.selfData, 'x', x)//设置自身的selfData中x的值
+        this.$set(item.nodes.selfData, 'y', y)//设置自身的selfData中y的值
+
         // this.emit("iconCellMove", {x: event.offsetX, y: event.offsetY})
       }
       document.onmouseup = () => {
@@ -145,20 +166,24 @@ export default {
     },
     /*画板被单击*/
     divClick() {
+      this.eventState = 'pointer'//画板被单击则变回普通状态
       // eslint-disable-next-line no-undef
       globalEvent.$emit('drawBoardClicked', true)
     },
     /*svg元素被单击 发送svgCellClicked事件 接收方为AttributeEditor组件*/
-    svgCellClicked(e,cellItem){
+    svgCellClicked(e, cellItem) {
       // eslint-disable-next-line no-undef
-      globalEvent.$emit('svgCellClicked',{e,'item':cellItem})
+      globalEvent.$emit('svgCellClicked', {e, 'item': cellItem})
     },
     /*TODO: svg组件之间使用Line元素连接*/
-    svgLink(e,item){
+    svgLink(e, item) {
+      // {item:{id,data,nodes}}
+
+
       console.log(e);
       console.log(item);
 
-    }
+    },
   },
   /*绑定事件  Event:deleteCell
   * 发送信号  reName 至 AttributeEditor created中
@@ -167,17 +192,26 @@ export default {
     let self = this
     // eslint-disable-next-line no-undef
     globalEvent.$on('contextMenuClick', data => {
-      console.log(data.menuItem);
+      // eslint-disable-next-line no-undef
+      globalEvent.$emit('drawBoardClicked', true)//发送信号将菜单关闭
       switch (data.menuItem.code) {
         case 0:
+          self.eventState = 'link'
+          break
+        case 1:
+          self.eventState = 'reName'
           // eslint-disable-next-line no-undef
           globalEvent.$emit('reName')
           break
-        case 1:
+        case 2:
+          self.eventState = 'deleteSvg'
           /*通过组件item的id删除svgNodes元素*/
           self.$delete(self.svgNodes, data.svgCellItemId)
           // eslint-disable-next-line no-undef
-          globalEvent.$emit('deleteSvg')
+          globalEvent.$emit('deleteSvg',self)
+          break
+        default:
+          self.eventState = 'pointer'
           break
       }
 

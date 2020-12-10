@@ -114,7 +114,9 @@ export default {
     })
 
     // eslint-disable-next-line no-undef
-    globalEvent.$on('deleteSvg',()=>{
+    globalEvent.$on('deleteSvg',(t)=>{
+      console.log(t);
+      t.eventState = 'deleteSvg'
       self.inputs.inputTitle = self.$refs['inputTitle']
       self.inputs.inputMouseInputX = self.$refs['inputX']
       self.inputs.inputMouseInputY = self.$refs['inputY']

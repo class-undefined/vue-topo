@@ -97,33 +97,29 @@ export default {
     }
   },
   created() {
-    let self = this
-    // eslint-disable-next-line no-undef
-    globalEvent.$on('svgCellClicked',data=>{
+    /*将该组件的实例加入至components*/
+    this.$set(this.components,'AttributeEditor',this)
+  },
+  methods:{
+    getSvgMsg(data){
       this.$set(this.svgItem,'data',data.item.data)//设置鼠标信息
       this.inputStatus.inputTitle.disable = false
       this.inputStatus.mouse.inputX.disable = false
       this.inputStatus.mouse.inputY.disable = false
-      // this.$set(this.svgItem.data,'svgData',data.item.data.svgData)
-    })
-    // eslint-disable-next-line no-undef
-    globalEvent.$on('reName',()=>{
-      self.inputs.inputTitle = self.$refs['inputTitle']
-      self.inputs.inputTitle.focus()
-
-    })
-
-    // eslint-disable-next-line no-undef
-    globalEvent.$on('deleteSvg',(t)=>{
-      console.log(t);
+    },
+    reName(){
+      this.inputs.inputTitle = this.$refs['inputTitle']
+      this.inputs.inputTitle.focus()
+    },
+    deleteSvg(t){
       t.eventState = 'deleteSvg'
-      self.inputs.inputTitle = self.$refs['inputTitle']
-      self.inputs.inputMouseInputX = self.$refs['inputX']
-      self.inputs.inputMouseInputY = self.$refs['inputY']
-      self.inputStatus.inputTitle.disable = true
-      self.inputStatus.mouse.inputX.disable = true
-      self.inputStatus.mouse.inputY.disable = true
-    })
+      this.inputs.inputTitle = this.$refs['inputTitle']
+      this.inputs.inputMouseInputX = this.$refs['inputX']
+      this.inputs.inputMouseInputY = this.$refs['inputY']
+      this.inputStatus.inputTitle.disable = true
+      this.inputStatus.mouse.inputX.disable = true
+      this.inputStatus.mouse.inputY.disable = true
+    }
   }
 }
 </script>

@@ -22,7 +22,7 @@
 import Menu from "@/components/Menu/Menu";
 import DrawBoard from "@/components/DrawBoard/DrawBoard";
 import AttributeEditor from "@/components/AttributeEditor/AttributeEditor";
-
+import '@/icons'
 export default {
   name: "Topo",
   components: {

@@ -29,26 +29,24 @@ export default {
   },
   /*绑定了接受事件：cellCheck、drwaBoardClicked*/
   created() {
-    /*接收组件被右击的事件消息*/
-    // eslint-disable-next-line no-undef
-    globalEvent.$on('cellCheck', res => {
-      // this.cellCheckEventData = res
-      this.x = res.e.pageX + config.svg.width
-      this.y = res.e.pageY
-      this.item = res.item
-      this.isShow = true
-    })
-    /*接受画板被单击的事件消息*/
-    // eslint-disable-next-line no-undef
-    globalEvent.$on('drawBoardClicked',()=>{
-      this.isShow = false
-    })
+    /*将组件信息添加到vue全局变量，方便操作此实例*/
+    this.$set(this.components,'ContextMenu',this)
   },
   methods: {
     /*菜单栏单击事件：发送deleteCell消息，携带参数为组件id 在DrawBoard组件中的create事件中接受该事件*/
     click(menuItem) {
-      // eslint-disable-next-line no-undef
-      globalEvent.$emit('contextMenuClick', {menuItem,'svgCellItemId':this.item.id})
+      this.components.DrawBoard.contextMenuClick({menuItem,'svgCellItemId':this.item.id})
+    },
+    /*组件被右击后，会通过this.components.ContextMenu.cellCheck来调用此函数*/
+    show(res){
+      this.x = res.e.pageX + config.svg.width
+      this.y = res.e.pageY
+      this.item = res.item
+      this.isShow = true
+    },
+    /*如果画板被单击，则不显示该组件*/
+    hiddenContextMenu(){
+      this.isShow = false
     }
   },
   computed:{

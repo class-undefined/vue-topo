@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 import './plugins/element.js'
-import '@/icons'
+
 Vue.config.productionTip = false
-window.globalEvent = new Vue();//注册全局事件对象
+Vue.prototype.components = {} //在vue中注册一个储存组件的容器，每个组件创建后都将自身加入这个容器
 new Vue({
   render: h => h(App),
 }).$mount('#app')
+
+

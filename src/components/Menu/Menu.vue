@@ -66,11 +66,15 @@ export default {
   },
   methods: {
     dragstartHandle(e, iconItem,svgId) {
-      // console.log(e.target.children[0]);
+
       /*将拖动目标的信息转换成json文本存放到事件中*/
       let data = JSON.stringify({path: iconItem.path, title: iconItem.title, desc: iconItem.desc,svgId:svgId})
       e.dataTransfer.setData("text/plain",data)
-    }
+    },
+  },
+  created() {
+    /*将该组件的实例加入至components*/
+    this.$set(this.components,'Menu',this)
   }
 }
 </script>

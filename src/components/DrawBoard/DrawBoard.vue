@@ -1,6 +1,7 @@
-<template>
+<template ref="DrawBoard">
   <div @click="divClick">
-    <svg class="board"
+    <svg id="draw_board"
+         class="board"
          ondragover="return false"
          oncontextmenu="return false"
          @mousemove="mousemove"
@@ -42,6 +43,7 @@ export default {
   data() {
     return {
       el: undefined,
+      addChilden:false,//用于实现只执行一次的加入symbol节点的功能
       mouseCursor: '',
       mouse: {
         x: 0,
@@ -71,27 +73,35 @@ export default {
     }
   },
   methods: {
-    /*接收拖放元素的事件 svgNodes在此处更新键值对*/
+    /*接收拖放元素的事件 svgNodes在此处更新键值对 当组件第一次被拖拽，则将symbol节点拷贝到draw_board的svg中
+    * 关于移动symbol节点 尝试过使用svg-sprite-loader官方提供的修改配置文件的方法，但使用后发现如果渲染指定id的节点元素，
+    *   会因为vue与svg-sprite-loader渲染顺序的关系，svg-sprite-loader先渲染，则找不到对应组件id，获取不到元素，
+    *   若vue先渲染id = app ，再用svg-sprite-loader渲染指定组件id，则将id = app的元素替换成了symbol内容，没有追加。
+    *   之后又尝试在draw-board组件中的mounted()事件中渲染，发现还是没有找到节点，查了vue文档后发现原因是
+    *   mounted不会保证所有的子组件也都一起被挂载。官方建议是在mounted中使用vm.$nextTick，
+    *   但我还没有尝试，还是决定用原生的方法：在元素被第一次拖拽时，将symbol节点的拷贝加入svg的子节点中，然后删除symbol节点。
+    * */
     dropHandle(e) {
+      if(!this.addChilden){
+        let symbol = document.getElementById('__SVG_SPRITE_NODE__')//找到symbol节点
+        let draw_board = document.getElementById('draw_board')//找到自身
+        draw_board.appendChild(symbol.cloneNode(true))//将symbol的深拷贝加入到画板节点中
+        symbol.remove()//将symbol节点移除
+        this.addChilden = true
+      }
+
       /*  DrawBoard.vue?c315:14 {"path":"3","title":"图标三","desc":"描述文本"}*/
       this.svgData = JSON.parse(e.dataTransfer.getData('text/plain'))//拖放成功则将该信息赋值给svgData
-      console.log(this.svgData);
-      let iconCellText = document.getElementById(this.svgData.svgId).innerText//use层
       /*将鼠标信息存入mouseData*/
       this.mouseData.x = e.offsetX - config.svg.width / 2;
       this.mouseData.y = e.offsetY - config.svg.height / 2;
       /*定义键值对*/
       let key = this.count
-      /*
-      {
-         svgData:{title,desc,path},
-         mouseData:{x,y}
-       }
-      */
+      /*{svgData:{title,desc,path},mouseData:{x,y}}*/
+
       let value = {
         /*{title,desc,path}*/
         svgData: this.svgData,
-        useText: iconCellText,
         /*{x,y}*/
         mouseData: {
           x: this.mouseData.x,
@@ -110,13 +120,7 @@ export default {
           // {id:0,x:0,y:0}
         ]
       }
-      /*item:{
-        id:Number,
-        data:{
-         svgData:{title,desc,path},
-         mouseData:{x,y}
-       }
-      }*/
+      /*item:{id:Number,data:{svgData:{title,desc,path},mouseData:{x,y}}}*/
       let item = {
         id: key,//组件唯一标识符 int
         data: value,//组件的svg信息及鼠标信息  {svgData,mouseData}
@@ -145,8 +149,6 @@ export default {
         this.$set(item.data.mouseData, 'y', y)
         this.$set(item.nodes.selfData, 'x', x)//设置自身的selfData中x的值
         this.$set(item.nodes.selfData, 'y', y)//设置自身的selfData中y的值
-
-        // this.emit("iconCellMove", {x: event.offsetX, y: event.offsetY})
       }
       document.onmouseup = () => {
         self.style.cursor = 'pointer'
@@ -161,19 +163,39 @@ export default {
     },
     /*右击菜单栏 发出了全局信号:cellCheck 携带数据{e,item}*/
     contextmenu(e, item) {
-      // eslint-disable-next-line no-undef
-      globalEvent.$emit('cellCheck', {e, item})
+      /*右击菜单栏 */
+      this.components.ContextMenu.show({e,item})
     },
     /*画板被单击*/
     divClick() {
       this.eventState = 'pointer'//画板被单击则变回普通状态
-      // eslint-disable-next-line no-undef
-      globalEvent.$emit('drawBoardClicked', true)
+      this.components.ContextMenu.hiddenContextMenu(true)//如果画板被单击，则不显示ContextMenu组件
     },
     /*svg元素被单击 发送svgCellClicked事件 接收方为AttributeEditor组件*/
     svgCellClicked(e, cellItem) {
-      // eslint-disable-next-line no-undef
-      globalEvent.$emit('svgCellClicked', {e, 'item': cellItem})
+      this.components.AttributeEditor.getSvgMsg({e, 'item': cellItem})
+    },
+    contextMenuClick(data){
+      let self = this
+      this.components.ContextMenu.hiddenContextMenu(true)
+      switch (data.menuItem.code) {
+        case 0:
+          self.eventState = 'link'
+          break
+        case 1:
+          self.eventState = 'reName'
+          this.components.AttributeEditor.reName()
+          break
+        case 2:
+          self.eventState = 'deleteSvg'
+          /*通过组件item的id删除svgNodes元素*/
+          self.$delete(self.svgNodes, data.svgCellItemId)
+          this.components.AttributeEditor.deleteSvg(self)
+          break
+        default:
+          self.eventState = 'pointer'
+          break
+      }
     },
     /*TODO: svg组件之间使用Line元素连接*/
     svgLink(e, item) {
@@ -184,38 +206,13 @@ export default {
       console.log(item);
 
     },
+
   },
   /*绑定事件  Event:deleteCell
   * 发送信号  reName 至 AttributeEditor created中
   * 发送信号  deleteSvg 至 AttributeEditor created*/
   created() {
-    let self = this
-    // eslint-disable-next-line no-undef
-    globalEvent.$on('contextMenuClick', data => {
-      // eslint-disable-next-line no-undef
-      globalEvent.$emit('drawBoardClicked', true)//发送信号将菜单关闭
-      switch (data.menuItem.code) {
-        case 0:
-          self.eventState = 'link'
-          break
-        case 1:
-          self.eventState = 'reName'
-          // eslint-disable-next-line no-undef
-          globalEvent.$emit('reName')
-          break
-        case 2:
-          self.eventState = 'deleteSvg'
-          /*通过组件item的id删除svgNodes元素*/
-          self.$delete(self.svgNodes, data.svgCellItemId)
-          // eslint-disable-next-line no-undef
-          globalEvent.$emit('deleteSvg',self)
-          break
-        default:
-          self.eventState = 'pointer'
-          break
-      }
-
-    })
+    this.$set(this.components,'DrawBoard',this)
   },
   computed: {
     svgHeight() {
